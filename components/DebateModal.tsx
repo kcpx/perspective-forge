@@ -147,15 +147,16 @@ export function DebateModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 bg-forge-text/20 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-forge-text/10 z-40"
           />
 
-          {/* Modal */}
+          {/* Slide-out Panel */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl md:max-h-[80vh] bg-forge-bg rounded-2xl border border-forge-border shadow-elevated z-50 flex flex-col overflow-hidden"
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed right-0 top-0 bottom-0 w-full max-w-lg bg-forge-bg border-l border-forge-border shadow-elevated z-50 flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-forge-border">
@@ -199,8 +200,8 @@ export function DebateModal({
                   key={index}
                   className={`p-4 rounded-xl ${
                     message.role === "user"
-                      ? "bg-forge-accent ml-8"
-                      : `card-${perspective.colorClass} mr-8`
+                      ? "bg-forge-accent ml-6"
+                      : `card-${perspective.colorClass} mr-6`
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-3">
@@ -237,7 +238,7 @@ export function DebateModal({
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSubmit} className="p-5 border-t border-forge-border">
+            <form onSubmit={handleSubmit} className="p-5 border-t border-forge-border bg-forge-bg">
               <div className="flex gap-3">
                 <input
                   type="text"
