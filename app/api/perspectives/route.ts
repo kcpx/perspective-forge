@@ -40,9 +40,10 @@ function cleanCache() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { input, perspective } = (await request.json()) as {
+    const { input, perspective, context } = (await request.json()) as {
       input: string;
       perspective: PerspectiveType;
+      context?: string;
     };
 
     if (!input || !perspective) {
@@ -52,8 +53,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check cache first
-    const cacheKey = getCacheKey(input, perspective);
+    // Include context in cache key if provided
+    const cacheKey = getCacheKey(input + (context || ""), perspective);
     const cached = responseCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       // Return cached response as SSE
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { system, user } = getPromptForPerspective(perspective, input);
+    const { system, user } = getPromptForPerspective(perspective, input, context);
 
     // Use Haiku for cost savings (60x cheaper than Sonnet)
     // Enable prompt caching for system prompt

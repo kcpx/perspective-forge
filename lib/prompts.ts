@@ -18,11 +18,25 @@ export const PERSPECTIVE_PROMPTS: Record<PerspectiveType, string> = {
 // Generate the prompt for a specific perspective
 export function getPromptForPerspective(
   perspective: PerspectiveType,
-  userInput: string
+  userInput: string,
+  context?: string
 ): { system: string; user: string } {
+  let systemPrompt = PERSPECTIVE_PROMPTS[perspective];
+
+  // Add context instruction if provided
+  if (context) {
+    systemPrompt += `\n\nIMPORTANT: The user has shared personal background context. Use this to tailor your response to their specific situation, values, and circumstances. Make your advice feel personal and relevant to who they are.`;
+  }
+
+  // Build user message with context if provided
+  let userMessage = userInput;
+  if (context) {
+    userMessage = `ABOUT ME: ${context}\n\nMY SITUATION: ${userInput}`;
+  }
+
   return {
-    system: PERSPECTIVE_PROMPTS[perspective],
-    user: userInput,
+    system: systemPrompt,
+    user: userMessage,
   };
 }
 

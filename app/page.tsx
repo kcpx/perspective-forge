@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, Clock, ChevronRight } from "lucide-react";
+import { ArrowRight, Loader2, Clock, ChevronRight, ChevronDown, User } from "lucide-react";
 import { PerspectiveCard } from "@/components/PerspectiveCard";
 import { DebateModal } from "@/components/DebateModal";
 import { HistoryPanel } from "@/components/HistoryPanel";
@@ -32,10 +32,25 @@ export default function Home() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<HistorySession[]>([]);
 
-  // Load history on mount
+  // Background context state
+  const [context, setContext] = useState("");
+  const [contextOpen, setContextOpen] = useState(false);
+
+  // Load history and context on mount
   useEffect(() => {
     setHistory(getHistory());
+    const savedContext = localStorage.getItem("perspective-forge-context");
+    if (savedContext) {
+      setContext(savedContext);
+    }
   }, []);
+
+  // Save context to localStorage when it changes
+  useEffect(() => {
+    if (context) {
+      localStorage.setItem("perspective-forge-context", context);
+    }
+  }, [context]);
 
   const refreshHistory = () => {
     setHistory(getHistory());
@@ -47,7 +62,7 @@ export default function Home() {
       const response = await fetch("/api/perspectives", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input, perspective }),
+        body: JSON.stringify({ input, perspective, context: context || undefined }),
       });
 
       if (!response.ok) throw new Error("Failed to fetch perspective");
@@ -84,7 +99,7 @@ export default function Home() {
       }
       setStreamingPerspective(null);
     },
-    [input]
+    [input, context]
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -251,6 +266,51 @@ export default function Home() {
                     )}
                   </button>
                 </form>
+
+                {/* Background Context */}
+                <div className="mt-6 pt-6 border-t border-forge-border">
+                  <button
+                    type="button"
+                    onClick={() => setContextOpen(!contextOpen)}
+                    className="flex items-center justify-between w-full text-left group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-forge-muted" />
+                      <span className="text-sm font-medium text-forge-text">About you</span>
+                      {context && (
+                        <span className="text-xs text-steelman-primary bg-steelman-light px-2 py-0.5 rounded-full">
+                          Added
+                        </span>
+                      )}
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-forge-muted transition-transform ${contextOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: contextOpen ? "auto" : 0,
+                      opacity: contextOpen ? 1 : 0
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-4">
+                      <p className="text-xs text-forge-muted mb-3">
+                        Add personal context to get more tailored perspectives. This is saved locally.
+                      </p>
+                      <textarea
+                        value={context}
+                        onChange={(e) => setContext(e.target.value)}
+                        placeholder="e.g., I'm a 28-year-old software engineer, married with no kids, currently living in San Francisco. I value work-life balance and financial security..."
+                        rows={3}
+                        className="w-full bg-forge-accent border border-forge-border rounded-lg px-3 py-2.5 text-sm text-forge-text placeholder-forge-muted/50 resize-none focus:border-steelman-primary/40 focus:ring-2 focus:ring-steelman-primary/10 transition-all"
+                      />
+                    </div>
+                  </motion.div>
+                </div>
 
                 {/* Presets */}
                 <div className="mt-6 pt-6 border-t border-forge-border">
