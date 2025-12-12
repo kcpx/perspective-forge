@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, MessageSquare } from "lucide-react";
+import { ArrowRight, Sparkles, MessageSquare, Clock } from "lucide-react";
 import { PerspectiveCard } from "@/components/PerspectiveCard";
 import { DebateModal } from "@/components/DebateModal";
+import { HistoryPanel } from "@/components/HistoryPanel";
 import { PERSPECTIVES, PerspectiveType, PerspectiveConfig } from "@/types";
+import { PRESETS } from "@/lib/presets";
+import { getHistory, saveSession, HistorySession } from "@/lib/history";
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -23,6 +26,19 @@ export default function Home() {
   const [debateOpen, setDebateOpen] = useState(false);
   const [debatePerspective, setDebatePerspective] = useState<PerspectiveConfig | null>(null);
   const [debateResponse, setDebateResponse] = useState("");
+
+  // History state
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<HistorySession[]>([]);
+
+  // Load history on mount
+  useEffect(() => {
+    setHistory(getHistory());
+  }, []);
+
+  const refreshHistory = () => {
+    setHistory(getHistory());
+  };
 
   const fetchPerspective = useCallback(
     async (perspective: PerspectiveType, setContent: (s: string) => void) => {
@@ -108,6 +124,35 @@ export default function Home() {
     }
   };
 
+  // Save to history after all perspectives complete
+  useEffect(() => {
+    if (currentPhase === "done" && steelmanContent && optimistContent && pragmatistContent && pessimistContent && blindspotsContent) {
+      saveSession({
+        input,
+        perspectives: {
+          steelman: steelmanContent,
+          optimist: optimistContent,
+          pragmatist: pragmatistContent,
+          pessimist: pessimistContent,
+          blindspots: blindspotsContent,
+        },
+      });
+      refreshHistory();
+    }
+  }, [currentPhase, input, steelmanContent, optimistContent, pragmatistContent, pessimistContent, blindspotsContent]);
+
+  // Load a session from history
+  const loadSession = (session: HistorySession) => {
+    setInput(session.input);
+    setSteelmanContent(session.perspectives.steelman);
+    setOptimistContent(session.perspectives.optimist);
+    setPragmatistContent(session.perspectives.pragmatist);
+    setPessimistContent(session.perspectives.pessimist);
+    setBlindspotsContent(session.perspectives.blindspots);
+    setHasResult(true);
+    setCurrentPhase("done");
+  };
+
   const showTrifecta = currentPhase === "trifecta" || currentPhase === "blindspots" || currentPhase === "done";
   const showBlindspots = currentPhase === "blindspots" || currentPhase === "done";
 
@@ -137,9 +182,20 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="font-display text-5xl md:text-6xl text-forge-text mb-4">
-            Perspective Forge
-          </h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h1 className="font-display text-5xl md:text-6xl text-forge-text">
+              Perspective Forge
+            </h1>
+            {history.length > 0 && (
+              <button
+                onClick={() => setHistoryOpen(true)}
+                className="p-2.5 rounded-xl bg-forge-surface border border-forge-border hover:border-steelman-primary/30 transition-all group"
+                title="View history"
+              >
+                <Clock className="w-5 h-5 text-forge-muted group-hover:text-steelman-primary transition-colors" />
+              </button>
+            )}
+          </div>
           <p className="text-forge-muted text-lg">
             See your thinking from every angle
           </p>
@@ -153,6 +209,21 @@ export default function Home() {
           onSubmit={handleSubmit}
           className="mb-12"
         >
+          {/* Quick Presets */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => setInput(preset.template)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-forge-surface border border-forge-border hover:border-steelman-primary/30 text-forge-muted hover:text-forge-text transition-all"
+              >
+                <span>{preset.icon}</span>
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
           <div className="relative">
             <textarea
               value={input}
@@ -324,6 +395,15 @@ export default function Home() {
           perspectiveResponse={debateResponse}
         />
       )}
+
+      {/* History Panel */}
+      <HistoryPanel
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        history={history}
+        onSelect={loadSession}
+        onHistoryChange={refreshHistory}
+      />
     </main>
   );
 }
