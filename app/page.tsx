@@ -178,122 +178,157 @@ export default function Home() {
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blindspots-primary/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative">
-        {/* Hero Section */}
-        <div className="max-w-4xl mx-auto px-6 pt-16 pb-8">
-          {/* Nav */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-between mb-16"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-steelman-primary" />
-              <span className="text-sm text-forge-muted font-medium">Perspective Forge</span>
-            </div>
-            {history.length > 0 && (
-              <button
-                onClick={() => setHistoryOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-forge-surface/50 border border-forge-border hover:border-steelman-primary/30 transition-all group"
-              >
-                <Clock className="w-4 h-4 text-forge-muted group-hover:text-steelman-primary transition-colors" />
-                <span className="text-sm text-forge-muted group-hover:text-forge-text transition-colors">
-                  {history.length} past {history.length === 1 ? "session" : "sessions"}
-                </span>
-              </button>
-            )}
-          </motion.div>
-
-          {/* Main Headline */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-center mb-12"
-          >
-            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl text-forge-text mb-6 leading-tight">
-              What&apos;s on your mind?
-            </h1>
-            <p className="text-forge-muted text-lg md:text-xl max-w-2xl mx-auto">
-              Share a decision you&apos;re wrestling with. We&apos;ll help you see it from every angle.
-            </p>
-          </motion.div>
-
-          {/* Input Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="max-w-2xl mx-auto"
-          >
-            {/* Presets as subtle suggestions */}
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
-              <span className="text-sm text-forge-muted/60">Try:</span>
-              {PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => setInput(preset.template)}
-                  className="text-sm text-forge-muted hover:text-steelman-primary transition-colors"
-                >
-                  {preset.icon} {preset.label}
-                </button>
-              ))}
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-steelman-primary/20 via-optimist-primary/20 to-pessimist-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative bg-forge-surface border border-forge-border rounded-2xl p-2 focus-within:border-steelman-primary/30 transition-all">
-                  <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="I'm thinking about..."
-                    rows={3}
-                    className="w-full bg-transparent px-4 py-3 text-forge-text text-lg placeholder-forge-muted/50 resize-none focus:outline-none"
-                  />
-                  <div className="flex justify-end px-2 pb-2">
-                    <button
-                      type="submit"
-                      disabled={!input.trim() || isLoading}
-                      className="bg-steelman-primary hover:bg-steelman-primary/90 disabled:bg-forge-border disabled:cursor-not-allowed text-forge-bg px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Sparkles className="w-4 h-4 animate-pulse" />
-                          Thinking...
-                        </>
-                      ) : (
-                        <>
-                          Explore
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
+      {/* Split Screen Layout */}
+      <div className="relative min-h-screen flex flex-col lg:flex-row">
+        {/* LEFT SIDE - Input (sticky on desktop) */}
+        <div className="lg:w-[45%] xl:w-[40%] lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-forge-border bg-forge-bg">
+          <div className="p-6 lg:p-10 xl:p-12 flex flex-col min-h-full">
+            {/* Nav */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center justify-between mb-8 lg:mb-12"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-steelman-primary" />
+                <span className="text-sm text-forge-muted font-medium">Perspective Forge</span>
               </div>
-            </form>
-          </motion.div>
+              {history.length > 0 && (
+                <button
+                  onClick={() => setHistoryOpen(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-forge-surface/50 border border-forge-border hover:border-steelman-primary/30 transition-all group"
+                >
+                  <Clock className="w-4 h-4 text-forge-muted group-hover:text-steelman-primary transition-colors" />
+                  <span className="text-sm text-forge-muted group-hover:text-forge-text transition-colors hidden sm:inline">
+                    {history.length} past
+                  </span>
+                </button>
+              )}
+            </motion.div>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col justify-center">
+              {/* Headline */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-8"
+              >
+                <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-forge-text mb-4 leading-tight">
+                  What&apos;s on<br />your mind?
+                </h1>
+                <p className="text-forge-muted text-base lg:text-lg">
+                  Share a decision you&apos;re wrestling with.
+                </p>
+              </motion.div>
+
+              {/* Input Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <form onSubmit={handleSubmit}>
+                  <div className="relative group mb-4">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-steelman-primary/20 via-optimist-primary/20 to-pessimist-primary/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative bg-forge-surface border border-forge-border rounded-xl p-1 focus-within:border-steelman-primary/30 transition-all">
+                      <textarea
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="I'm thinking about..."
+                        rows={4}
+                        className="w-full bg-transparent px-4 py-3 text-forge-text text-base lg:text-lg placeholder-forge-muted/50 resize-none focus:outline-none"
+                      />
+                      <div className="flex justify-end px-2 pb-2">
+                        <button
+                          type="submit"
+                          disabled={!input.trim() || isLoading}
+                          className="bg-steelman-primary hover:bg-steelman-primary/90 disabled:bg-forge-border disabled:cursor-not-allowed text-forge-bg px-5 py-2 rounded-lg font-medium flex items-center gap-2 transition-all text-sm"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Sparkles className="w-4 h-4 animate-pulse" />
+                              Thinking...
+                            </>
+                          ) : (
+                            <>
+                              Explore
+                              <ArrowRight className="w-4 h-4" />
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+
+                {/* Presets */}
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs text-forge-muted/60 mr-1">Try:</span>
+                  {PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => setInput(preset.template)}
+                      className="text-xs text-forge-muted hover:text-steelman-primary transition-colors"
+                    >
+                      {preset.icon} {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Bottom hint */}
+            {!hasResult && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-forge-muted/40 text-xs mt-8 hidden lg:block"
+              >
+                Your perspectives will appear on the right →
+              </motion.p>
+            )}
+          </div>
         </div>
 
-        {/* Results */}
-        {hasResult && (
-          <div className="bg-forge-surface/30 border-t border-forge-border">
-            <div className="max-w-4xl mx-auto px-6 py-12 space-y-16">
-              {/* User's Question - Echo back what they asked */}
+        {/* RIGHT SIDE - Results (scrollable) */}
+        <div className="lg:w-[55%] xl:w-[60%] lg:ml-[45%] xl:ml-[40%] min-h-screen">
+          {!hasResult ? (
+            // Empty state
+            <div className="h-full min-h-[50vh] lg:min-h-screen flex items-center justify-center p-6">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
                 className="text-center"
               >
-                <p className="text-forge-muted text-sm uppercase tracking-widest mb-3">Your Question</p>
-                <p className="text-xl md:text-2xl text-forge-text font-display italic max-w-2xl mx-auto">
+                <div className="w-16 h-16 rounded-full bg-forge-surface border border-forge-border flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-6 h-6 text-forge-muted/50" />
+                </div>
+                <p className="text-forge-muted/60 text-sm">
+                  Your perspectives will appear here
+                </p>
+              </motion.div>
+            </div>
+          ) : (
+            // Results
+            <div className="p-6 lg:p-10 xl:p-12 space-y-12">
+              {/* User's Question */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="pb-8 border-b border-forge-border"
+              >
+                <p className="text-forge-muted text-xs uppercase tracking-widest mb-2">Exploring</p>
+                <p className="text-lg lg:text-xl text-forge-text font-display italic">
                   &ldquo;{input}&rdquo;
                 </p>
               </motion.div>
 
-              {/* Section 1: Steelman - Hero Card */}
+              {/* Section 1: Steelman */}
               <PerspectiveCard
                 config={PERSPECTIVES.steelman}
                 content={steelmanContent}
@@ -308,18 +343,16 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="space-y-6"
+                  className="space-y-4"
                 >
-                  {/* Section Header */}
-                  <div className="text-center">
-                    <p className="text-forge-muted text-sm uppercase tracking-widest mb-2">Three Lenses</p>
-                    <h2 className="font-display text-2xl md:text-3xl text-forge-text">
-                      See it from every angle
+                  <div>
+                    <p className="text-forge-muted text-xs uppercase tracking-widest mb-1">Three Lenses</p>
+                    <h2 className="font-display text-xl lg:text-2xl text-forge-text">
+                      Different angles
                     </h2>
                   </div>
 
-                  {/* Three perspective cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <PerspectiveCard
                       config={PERSPECTIVES.optimist}
                       content={optimistContent}
@@ -348,13 +381,12 @@ export default function Home() {
                 </motion.div>
               )}
 
-              {/* Section 3: Blind Spots - Insight Card */}
+              {/* Section 3: Blind Spots */}
               {showBlindspots && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="max-w-2xl mx-auto"
                 >
                   <PerspectiveCard
                     config={PERSPECTIVES.blindspots}
@@ -372,44 +404,43 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
-                  className="text-center space-y-6"
+                  className="pt-8 border-t border-forge-border space-y-4"
                 >
                   <div>
-                    <p className="text-forge-muted text-sm uppercase tracking-widest mb-2">Not convinced?</p>
-                    <h2 className="font-display text-2xl text-forge-text">
+                    <p className="text-forge-muted text-xs uppercase tracking-widest mb-1">Go deeper</p>
+                    <h2 className="font-display text-xl text-forge-text">
                       Challenge a perspective
                     </h2>
                   </div>
 
-                  {/* Debate Buttons */}
-                  <div className="flex flex-wrap justify-center gap-3">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => openDebate(PERSPECTIVES.optimist, optimistContent)}
-                      className="flex items-center gap-2 px-5 py-3 rounded-full bg-forge-bg border border-optimist-primary/30 text-optimist-primary hover:bg-optimist-primary/10 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-forge-surface border border-optimist-primary/30 text-optimist-primary hover:bg-optimist-primary/10 transition-all text-sm"
                     >
-                      <MessageSquare className="w-4 h-4" />
-                      Push back on Optimist
+                      <MessageSquare className="w-3 h-3" />
+                      Optimist
                     </button>
                     <button
                       onClick={() => openDebate(PERSPECTIVES.pragmatist, pragmatistContent)}
-                      className="flex items-center gap-2 px-5 py-3 rounded-full bg-forge-bg border border-pragmatist-primary/30 text-pragmatist-primary hover:bg-pragmatist-primary/10 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-forge-surface border border-pragmatist-primary/30 text-pragmatist-primary hover:bg-pragmatist-primary/10 transition-all text-sm"
                     >
-                      <MessageSquare className="w-4 h-4" />
-                      Push back on Pragmatist
+                      <MessageSquare className="w-3 h-3" />
+                      Pragmatist
                     </button>
                     <button
                       onClick={() => openDebate(PERSPECTIVES.pessimist, pessimistContent)}
-                      className="flex items-center gap-2 px-5 py-3 rounded-full bg-forge-bg border border-pessimist-primary/30 text-pessimist-primary hover:bg-pessimist-primary/10 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-forge-surface border border-pessimist-primary/30 text-pessimist-primary hover:bg-pessimist-primary/10 transition-all text-sm"
                     >
-                      <MessageSquare className="w-4 h-4" />
-                      Push back on Pessimist
+                      <MessageSquare className="w-3 h-3" />
+                      Pessimist
                     </button>
                   </div>
                 </motion.div>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Debate Modal */}
