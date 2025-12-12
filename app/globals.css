@@ -73,6 +73,20 @@ body {
   box-shadow: 0 0 40px rgba(59, 130, 246, 0.1);
 }
 
+.card-blindspots {
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.08) 0%,
+    rgba(168, 85, 247, 0.02) 100%
+  );
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.card-blindspots:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.1);
+}
+
 /* Shimmer loading effect */
 .shimmer {
   background: linear-gradient(

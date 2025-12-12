@@ -12,10 +12,11 @@ export default function Home() {
   const [optimistContent, setOptimistContent] = useState("");
   const [pragmatistContent, setPragmatistContent] = useState("");
   const [pessimistContent, setPessimistContent] = useState("");
+  const [blindspotsContent, setBlindspotsContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingPerspective, setStreamingPerspective] = useState<PerspectiveType | null>(null);
   const [hasResult, setHasResult] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<"steelman" | "trifecta" | "done">("steelman");
+  const [currentPhase, setCurrentPhase] = useState<"steelman" | "trifecta" | "blindspots" | "done">("steelman");
 
   const fetchPerspective = useCallback(
     async (perspective: PerspectiveType, setContent: (s: string) => void) => {
@@ -72,6 +73,7 @@ export default function Home() {
     setOptimistContent("");
     setPragmatistContent("");
     setPessimistContent("");
+    setBlindspotsContent("");
     setHasResult(true);
     setCurrentPhase("steelman");
 
@@ -87,6 +89,10 @@ export default function Home() {
         fetchPerspective("pessimist", setPessimistContent),
       ]);
 
+      // Phase 3: Blind Spots
+      setCurrentPhase("blindspots");
+      await fetchPerspective("blindspots", setBlindspotsContent);
+
       setCurrentPhase("done");
     } catch (error) {
       console.error("Error:", error);
@@ -96,7 +102,8 @@ export default function Home() {
     }
   };
 
-  const showTrifecta = currentPhase === "trifecta" || currentPhase === "done";
+  const showTrifecta = currentPhase === "trifecta" || currentPhase === "blindspots" || currentPhase === "done";
+  const showBlindspots = currentPhase === "blindspots" || currentPhase === "done";
 
   return (
     <main className="min-h-screen bg-forge-bg">
@@ -216,17 +223,28 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* Placeholder for Blind Spots */}
-            {currentPhase === "done" && (
+            {/* Section 3: Blind Spots */}
+            {showBlindspots && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-center pt-4"
+                transition={{ duration: 0.5 }}
               >
-                <p className="text-forge-muted text-sm">
-                  🔮 Blind Spots coming next...
-                </p>
+                {/* Section Label */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-forge-border" />
+                  <span className="text-forge-muted text-sm font-medium uppercase tracking-wider">
+                    The Aha Moment
+                  </span>
+                  <div className="h-px flex-1 bg-forge-border" />
+                </div>
+
+                <PerspectiveCard
+                  config={PERSPECTIVES.blindspots}
+                  content={blindspotsContent}
+                  isStreaming={streamingPerspective === "blindspots"}
+                  isLoading={currentPhase === "blindspots" && !blindspotsContent}
+                />
               </motion.div>
             )}
           </motion.div>

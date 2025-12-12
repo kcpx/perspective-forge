@@ -60,6 +60,6 @@ export const PERSPECTIVES: Record<PerspectiveType, PerspectiveConfig> = {
     name: "Blind Spots",
     icon: "🔮",
     description: "What all perspectives missed or assumed",
-    colorClass: "pragmatist",
+    colorClass: "blindspots",
   },
 };

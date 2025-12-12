@@ -17,6 +17,7 @@ const cursorColors: Record<string, string> = {
   optimist: "bg-optimist-primary",
   pragmatist: "bg-pragmatist-primary",
   pessimist: "bg-pessimist-primary",
+  blindspots: "bg-blindspots-primary",
 };
 
 export function PerspectiveCard({

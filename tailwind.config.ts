@@ -37,6 +37,11 @@ const config: Config = {
           secondary: "#dbeafe",
           glow: "rgba(59, 130, 246, 0.15)",
         },
+        blindspots: {
+          primary: "#a855f7",
+          secondary: "#f3e8ff",
+          glow: "rgba(168, 85, 247, 0.15)",
+        },
       },
       fontFamily: {
         display: ["var(--font-display)", "serif"],
