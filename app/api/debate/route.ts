@@ -29,11 +29,17 @@ export async function POST(request: NextRequest) {
       challenge
     );
 
-    // Create streaming response
+    // Use Haiku for cost savings, with prompt caching
     const stream = anthropic.messages.stream({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
-      system,
+      model: "claude-3-5-haiku-20241022",
+      max_tokens: 512,
+      system: [
+        {
+          type: "text",
+          text: system,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
       messages: [{ role: "user", content: user }],
     });
 
