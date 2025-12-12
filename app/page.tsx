@@ -2,9 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, MessageSquare } from "lucide-react";
 import { PerspectiveCard } from "@/components/PerspectiveCard";
-import { PERSPECTIVES, PerspectiveType } from "@/types";
+import { DebateModal } from "@/components/DebateModal";
+import { PERSPECTIVES, PerspectiveType, PerspectiveConfig } from "@/types";
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -17,6 +18,11 @@ export default function Home() {
   const [streamingPerspective, setStreamingPerspective] = useState<PerspectiveType | null>(null);
   const [hasResult, setHasResult] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<"steelman" | "trifecta" | "blindspots" | "done">("steelman");
+
+  // Debate mode state
+  const [debateOpen, setDebateOpen] = useState(false);
+  const [debatePerspective, setDebatePerspective] = useState<PerspectiveConfig | null>(null);
+  const [debateResponse, setDebateResponse] = useState("");
 
   const fetchPerspective = useCallback(
     async (perspective: PerspectiveType, setContent: (s: string) => void) => {
@@ -104,6 +110,20 @@ export default function Home() {
 
   const showTrifecta = currentPhase === "trifecta" || currentPhase === "blindspots" || currentPhase === "done";
   const showBlindspots = currentPhase === "blindspots" || currentPhase === "done";
+
+  const openDebate = (perspective: PerspectiveConfig, response: string) => {
+    setDebatePerspective(perspective);
+    setDebateResponse(response);
+    setDebateOpen(true);
+  };
+
+  const perspectiveContents: Record<PerspectiveType, string> = {
+    steelman: steelmanContent,
+    optimist: optimistContent,
+    pragmatist: pragmatistContent,
+    pessimist: pessimistContent,
+    blindspots: blindspotsContent,
+  };
 
   return (
     <main className="min-h-screen bg-forge-bg">
@@ -247,9 +267,63 @@ export default function Home() {
                 />
               </motion.div>
             )}
+
+            {/* Section 4: Debate Mode */}
+            {currentPhase === "done" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                {/* Section Label */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-forge-border" />
+                  <span className="text-forge-muted text-sm font-medium uppercase tracking-wider">
+                    Go Deeper
+                  </span>
+                  <div className="h-px flex-1 bg-forge-border" />
+                </div>
+
+                {/* Debate Buttons */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button
+                    onClick={() => openDebate(PERSPECTIVES.optimist, optimistContent)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-optimist-glow border border-optimist-primary/30 text-optimist-primary hover:bg-optimist-primary/20 transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Debate Optimist
+                  </button>
+                  <button
+                    onClick={() => openDebate(PERSPECTIVES.pragmatist, pragmatistContent)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pragmatist-glow border border-pragmatist-primary/30 text-pragmatist-primary hover:bg-pragmatist-primary/20 transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Debate Pragmatist
+                  </button>
+                  <button
+                    onClick={() => openDebate(PERSPECTIVES.pessimist, pessimistContent)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pessimist-glow border border-pessimist-primary/30 text-pessimist-primary hover:bg-pessimist-primary/20 transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Debate Pessimist
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </div>
+
+      {/* Debate Modal */}
+      {debatePerspective && (
+        <DebateModal
+          isOpen={debateOpen}
+          onClose={() => setDebateOpen(false)}
+          perspective={debatePerspective}
+          originalInput={input}
+          perspectiveResponse={debateResponse}
+        />
+      )}
     </main>
   );
 }

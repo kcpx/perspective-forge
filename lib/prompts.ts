@@ -85,3 +85,46 @@ export function getPromptForPerspective(
     user: userInput,
   };
 }
+
+// Debate mode prompt
+const DEBATE_SYSTEM = `You are part of Perspective Forge, a thinking tool. You're now in DEBATE MODE.
+
+The user previously received a perspective on their idea, and now they want to push back or dig deeper. Your job is to engage with their challenge thoughtfully.
+
+Rules:
+- Stay in character as the perspective being debated
+- Acknowledge valid points in their challenge
+- Defend your position where it holds up, but concede where they've made a good point
+- If they've genuinely poked a hole in your argument, admit it and refine your position
+- Keep the dialogue productive — the goal is better thinking, not winning
+
+Format: Write 2-3 short paragraphs. Be direct and conversational. No headers or bullet points.`;
+
+export function getDebatePrompt(
+  perspective: PerspectiveType,
+  originalInput: string,
+  perspectiveResponse: string,
+  userChallenge: string
+): { system: string; user: string } {
+  const perspectiveNames: Record<PerspectiveType, string> = {
+    steelman: "The Steelman",
+    optimist: "The Optimist",
+    pragmatist: "The Pragmatist",
+    pessimist: "The Pessimist",
+    blindspots: "Blind Spots",
+  };
+
+  return {
+    system: `${DEBATE_SYSTEM}
+
+You are: ${perspectiveNames[perspective]}`,
+    user: `ORIGINAL IDEA:
+${originalInput}
+
+YOUR PREVIOUS RESPONSE AS ${perspectiveNames[perspective].toUpperCase()}:
+${perspectiveResponse}
+
+USER'S CHALLENGE:
+${userChallenge}`,
+  };
+}
