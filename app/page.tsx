@@ -9,12 +9,17 @@ import { PERSPECTIVES, PerspectiveType } from "@/types";
 export default function Home() {
   const [input, setInput] = useState("");
   const [steelmanContent, setSteelmanContent] = useState("");
+  const [optimistContent, setOptimistContent] = useState("");
+  const [pragmatistContent, setPragmatistContent] = useState("");
+  const [pessimistContent, setPessimistContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingPerspective, setStreamingPerspective] = useState<PerspectiveType | null>(null);
   const [hasResult, setHasResult] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState<"steelman" | "trifecta" | "done">("steelman");
 
   const fetchPerspective = useCallback(
     async (perspective: PerspectiveType, setContent: (s: string) => void) => {
+      setStreamingPerspective(perspective);
       const response = await fetch("/api/perspectives", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,6 +58,7 @@ export default function Home() {
           }
         }
       }
+      setStreamingPerspective(null);
     },
     [input]
   );
@@ -62,27 +68,42 @@ export default function Home() {
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
-    setIsStreaming(true);
     setSteelmanContent("");
+    setOptimistContent("");
+    setPragmatistContent("");
+    setPessimistContent("");
     setHasResult(true);
+    setCurrentPhase("steelman");
 
     try {
+      // Phase 1: Steelman
       await fetchPerspective("steelman", setSteelmanContent);
+
+      // Phase 2: Trifecta (in parallel)
+      setCurrentPhase("trifecta");
+      await Promise.all([
+        fetchPerspective("optimist", setOptimistContent),
+        fetchPerspective("pragmatist", setPragmatistContent),
+        fetchPerspective("pessimist", setPessimistContent),
+      ]);
+
+      setCurrentPhase("done");
     } catch (error) {
       console.error("Error:", error);
-      setSteelmanContent("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
-      setIsStreaming(false);
+      setStreamingPerspective(null);
     }
   };
+
+  const showTrifecta = currentPhase === "trifecta" || currentPhase === "done";
 
   return (
     <main className="min-h-screen bg-forge-bg">
       {/* Background gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-steelman-glow via-transparent to-transparent pointer-events-none" />
 
-      <div className="relative max-w-3xl mx-auto px-6 py-16">
+      <div className="relative max-w-4xl mx-auto px-6 py-16">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -133,31 +154,78 @@ export default function Home() {
           </div>
         </motion.form>
 
-        {/* Results - MVP: Steelman only */}
+        {/* Results */}
         {hasResult && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
+            className="space-y-8"
           >
+            {/* Section 1: Steelman */}
             <PerspectiveCard
               config={PERSPECTIVES.steelman}
               content={steelmanContent}
-              isStreaming={isStreaming}
-              isLoading={isLoading}
+              isStreaming={streamingPerspective === "steelman"}
+              isLoading={currentPhase === "steelman" && !steelmanContent}
             />
 
-            {/* Placeholder for future sections */}
-            {!isLoading && steelmanContent && (
+            {/* Section 2: The Trifecta */}
+            {showTrifecta && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Section Label */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-forge-border" />
+                  <span className="text-forge-muted text-sm font-medium uppercase tracking-wider">
+                    The Trifecta
+                  </span>
+                  <div className="h-px flex-1 bg-forge-border" />
+                </div>
+
+                {/* Three perspective cards in a row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <PerspectiveCard
+                    config={PERSPECTIVES.optimist}
+                    content={optimistContent}
+                    isStreaming={streamingPerspective === "optimist"}
+                    isLoading={!optimistContent && currentPhase === "trifecta"}
+                    delay={0.1}
+                    compact
+                  />
+                  <PerspectiveCard
+                    config={PERSPECTIVES.pragmatist}
+                    content={pragmatistContent}
+                    isStreaming={streamingPerspective === "pragmatist"}
+                    isLoading={!pragmatistContent && currentPhase === "trifecta"}
+                    delay={0.2}
+                    compact
+                  />
+                  <PerspectiveCard
+                    config={PERSPECTIVES.pessimist}
+                    content={pessimistContent}
+                    isStreaming={streamingPerspective === "pessimist"}
+                    isLoading={!pessimistContent && currentPhase === "trifecta"}
+                    delay={0.3}
+                    compact
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {/* Placeholder for Blind Spots */}
+            {currentPhase === "done" && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="mt-8 text-center"
+                className="text-center pt-4"
               >
                 <p className="text-forge-muted text-sm">
-                  🚧 More perspectives coming soon: Optimist, Pragmatist,
-                  Pessimist, and Blind Spots
+                  🔮 Blind Spots coming next...
                 </p>
               </motion.div>
             )}
