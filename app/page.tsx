@@ -172,216 +172,243 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-forge-bg">
-      {/* Background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-br from-steelman-glow via-transparent to-transparent pointer-events-none" />
+      {/* Background elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-steelman-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blindspots-primary/5 rounded-full blur-3xl" />
+      </div>
 
-      <div className="relative max-w-4xl mx-auto px-6 py-16">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="font-display text-5xl md:text-6xl text-forge-text">
-              Perspective Forge
-            </h1>
-            {history.length > 0 && (
-              <button
-                onClick={() => setHistoryOpen(true)}
-                className="p-2.5 rounded-xl bg-forge-surface border border-forge-border hover:border-steelman-primary/30 transition-all group"
-                title="View history"
-              >
-                <Clock className="w-5 h-5 text-forge-muted group-hover:text-steelman-primary transition-colors" />
-              </button>
-            )}
-          </div>
-          <p className="text-forge-muted text-lg">
-            See your thinking from every angle
-          </p>
-        </motion.div>
-
-        {/* Input Form */}
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          onSubmit={handleSubmit}
-          className="mb-12"
-        >
-          {/* Quick Presets */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            {PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                onClick={() => setInput(preset.template)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-forge-surface border border-forge-border hover:border-steelman-primary/30 text-forge-muted hover:text-forge-text transition-all"
-              >
-                <span>{preset.icon}</span>
-                {preset.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Share a decision, belief, or idea you're wrestling with..."
-              rows={4}
-              className="w-full bg-forge-surface border border-forge-border rounded-2xl px-6 py-4 text-forge-text placeholder-forge-muted resize-none focus:ring-2 focus:ring-steelman-primary/30 transition-all"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="absolute bottom-4 right-4 bg-steelman-primary hover:bg-steelman-primary/90 disabled:bg-forge-border disabled:cursor-not-allowed text-forge-bg px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all"
-            >
-              {isLoading ? (
-                <>
-                  <Sparkles className="w-4 h-4 animate-pulse" />
-                  Forging...
-                </>
-              ) : (
-                <>
-                  Forge
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </div>
-        </motion.form>
-
-        {/* Results */}
-        {hasResult && (
+      <div className="relative">
+        {/* Hero Section */}
+        <div className="max-w-4xl mx-auto px-6 pt-16 pb-8">
+          {/* Nav */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="space-y-8"
+            className="flex items-center justify-between mb-16"
           >
-            {/* Section 1: Steelman */}
-            <PerspectiveCard
-              config={PERSPECTIVES.steelman}
-              content={steelmanContent}
-              isStreaming={streamingPerspective === "steelman"}
-              isLoading={currentPhase === "steelman" && !steelmanContent}
-            />
-
-            {/* Section 2: The Trifecta */}
-            {showTrifecta && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-steelman-primary" />
+              <span className="text-sm text-forge-muted font-medium">Perspective Forge</span>
+            </div>
+            {history.length > 0 && (
+              <button
+                onClick={() => setHistoryOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-forge-surface/50 border border-forge-border hover:border-steelman-primary/30 transition-all group"
               >
-                {/* Section Label */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-forge-border" />
-                  <span className="text-forge-muted text-sm font-medium uppercase tracking-wider">
-                    The Trifecta
-                  </span>
-                  <div className="h-px flex-1 bg-forge-border" />
-                </div>
-
-                {/* Three perspective cards in a row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <PerspectiveCard
-                    config={PERSPECTIVES.optimist}
-                    content={optimistContent}
-                    isStreaming={streamingPerspective === "optimist"}
-                    isLoading={!optimistContent && currentPhase === "trifecta"}
-                    delay={0.1}
-                    compact
-                  />
-                  <PerspectiveCard
-                    config={PERSPECTIVES.pragmatist}
-                    content={pragmatistContent}
-                    isStreaming={streamingPerspective === "pragmatist"}
-                    isLoading={!pragmatistContent && currentPhase === "trifecta"}
-                    delay={0.2}
-                    compact
-                  />
-                  <PerspectiveCard
-                    config={PERSPECTIVES.pessimist}
-                    content={pessimistContent}
-                    isStreaming={streamingPerspective === "pessimist"}
-                    isLoading={!pessimistContent && currentPhase === "trifecta"}
-                    delay={0.3}
-                    compact
-                  />
-                </div>
-              </motion.div>
-            )}
-
-            {/* Section 3: Blind Spots */}
-            {showBlindspots && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {/* Section Label */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-forge-border" />
-                  <span className="text-forge-muted text-sm font-medium uppercase tracking-wider">
-                    The Aha Moment
-                  </span>
-                  <div className="h-px flex-1 bg-forge-border" />
-                </div>
-
-                <PerspectiveCard
-                  config={PERSPECTIVES.blindspots}
-                  content={blindspotsContent}
-                  isStreaming={streamingPerspective === "blindspots"}
-                  isLoading={currentPhase === "blindspots" && !blindspotsContent}
-                />
-              </motion.div>
-            )}
-
-            {/* Section 4: Debate Mode */}
-            {currentPhase === "done" && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                {/* Section Label */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-forge-border" />
-                  <span className="text-forge-muted text-sm font-medium uppercase tracking-wider">
-                    Go Deeper
-                  </span>
-                  <div className="h-px flex-1 bg-forge-border" />
-                </div>
-
-                {/* Debate Buttons */}
-                <div className="flex flex-wrap justify-center gap-3">
-                  <button
-                    onClick={() => openDebate(PERSPECTIVES.optimist, optimistContent)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-optimist-glow border border-optimist-primary/30 text-optimist-primary hover:bg-optimist-primary/20 transition-all"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    Debate Optimist
-                  </button>
-                  <button
-                    onClick={() => openDebate(PERSPECTIVES.pragmatist, pragmatistContent)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pragmatist-glow border border-pragmatist-primary/30 text-pragmatist-primary hover:bg-pragmatist-primary/20 transition-all"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    Debate Pragmatist
-                  </button>
-                  <button
-                    onClick={() => openDebate(PERSPECTIVES.pessimist, pessimistContent)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pessimist-glow border border-pessimist-primary/30 text-pessimist-primary hover:bg-pessimist-primary/20 transition-all"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    Debate Pessimist
-                  </button>
-                </div>
-              </motion.div>
+                <Clock className="w-4 h-4 text-forge-muted group-hover:text-steelman-primary transition-colors" />
+                <span className="text-sm text-forge-muted group-hover:text-forge-text transition-colors">
+                  {history.length} past {history.length === 1 ? "session" : "sessions"}
+                </span>
+              </button>
             )}
           </motion.div>
+
+          {/* Main Headline */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-center mb-12"
+          >
+            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl text-forge-text mb-6 leading-tight">
+              What&apos;s on your mind?
+            </h1>
+            <p className="text-forge-muted text-lg md:text-xl max-w-2xl mx-auto">
+              Share a decision you&apos;re wrestling with. We&apos;ll help you see it from every angle.
+            </p>
+          </motion.div>
+
+          {/* Input Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-2xl mx-auto"
+          >
+            {/* Presets as subtle suggestions */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              <span className="text-sm text-forge-muted/60">Try:</span>
+              {PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => setInput(preset.template)}
+                  className="text-sm text-forge-muted hover:text-steelman-primary transition-colors"
+                >
+                  {preset.icon} {preset.label}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-steelman-primary/20 via-optimist-primary/20 to-pessimist-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative bg-forge-surface border border-forge-border rounded-2xl p-2 focus-within:border-steelman-primary/30 transition-all">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="I'm thinking about..."
+                    rows={3}
+                    className="w-full bg-transparent px-4 py-3 text-forge-text text-lg placeholder-forge-muted/50 resize-none focus:outline-none"
+                  />
+                  <div className="flex justify-end px-2 pb-2">
+                    <button
+                      type="submit"
+                      disabled={!input.trim() || isLoading}
+                      className="bg-steelman-primary hover:bg-steelman-primary/90 disabled:bg-forge-border disabled:cursor-not-allowed text-forge-bg px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Sparkles className="w-4 h-4 animate-pulse" />
+                          Thinking...
+                        </>
+                      ) : (
+                        <>
+                          Explore
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+
+        {/* Results */}
+        {hasResult && (
+          <div className="bg-forge-surface/30 border-t border-forge-border">
+            <div className="max-w-4xl mx-auto px-6 py-12 space-y-16">
+              {/* User's Question - Echo back what they asked */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center"
+              >
+                <p className="text-forge-muted text-sm uppercase tracking-widest mb-3">Your Question</p>
+                <p className="text-xl md:text-2xl text-forge-text font-display italic max-w-2xl mx-auto">
+                  &ldquo;{input}&rdquo;
+                </p>
+              </motion.div>
+
+              {/* Section 1: Steelman - Hero Card */}
+              <PerspectiveCard
+                config={PERSPECTIVES.steelman}
+                content={steelmanContent}
+                isStreaming={streamingPerspective === "steelman"}
+                isLoading={currentPhase === "steelman" && !steelmanContent}
+                variant="hero"
+              />
+
+              {/* Section 2: The Trifecta */}
+              {showTrifecta && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-6"
+                >
+                  {/* Section Header */}
+                  <div className="text-center">
+                    <p className="text-forge-muted text-sm uppercase tracking-widest mb-2">Three Lenses</p>
+                    <h2 className="font-display text-2xl md:text-3xl text-forge-text">
+                      See it from every angle
+                    </h2>
+                  </div>
+
+                  {/* Three perspective cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <PerspectiveCard
+                      config={PERSPECTIVES.optimist}
+                      content={optimistContent}
+                      isStreaming={streamingPerspective === "optimist"}
+                      isLoading={!optimistContent && currentPhase === "trifecta"}
+                      delay={0.1}
+                      variant="trifecta"
+                    />
+                    <PerspectiveCard
+                      config={PERSPECTIVES.pragmatist}
+                      content={pragmatistContent}
+                      isStreaming={streamingPerspective === "pragmatist"}
+                      isLoading={!pragmatistContent && currentPhase === "trifecta"}
+                      delay={0.2}
+                      variant="trifecta"
+                    />
+                    <PerspectiveCard
+                      config={PERSPECTIVES.pessimist}
+                      content={pessimistContent}
+                      isStreaming={streamingPerspective === "pessimist"}
+                      isLoading={!pessimistContent && currentPhase === "trifecta"}
+                      delay={0.3}
+                      variant="trifecta"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Section 3: Blind Spots - Insight Card */}
+              {showBlindspots && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="max-w-2xl mx-auto"
+                >
+                  <PerspectiveCard
+                    config={PERSPECTIVES.blindspots}
+                    content={blindspotsContent}
+                    isStreaming={streamingPerspective === "blindspots"}
+                    isLoading={currentPhase === "blindspots" && !blindspotsContent}
+                    variant="insight"
+                  />
+                </motion.div>
+              )}
+
+              {/* Section 4: Debate Mode */}
+              {currentPhase === "done" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="text-center space-y-6"
+                >
+                  <div>
+                    <p className="text-forge-muted text-sm uppercase tracking-widest mb-2">Not convinced?</p>
+                    <h2 className="font-display text-2xl text-forge-text">
+                      Challenge a perspective
+                    </h2>
+                  </div>
+
+                  {/* Debate Buttons */}
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                      onClick={() => openDebate(PERSPECTIVES.optimist, optimistContent)}
+                      className="flex items-center gap-2 px-5 py-3 rounded-full bg-forge-bg border border-optimist-primary/30 text-optimist-primary hover:bg-optimist-primary/10 transition-all"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      Push back on Optimist
+                    </button>
+                    <button
+                      onClick={() => openDebate(PERSPECTIVES.pragmatist, pragmatistContent)}
+                      className="flex items-center gap-2 px-5 py-3 rounded-full bg-forge-bg border border-pragmatist-primary/30 text-pragmatist-primary hover:bg-pragmatist-primary/10 transition-all"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      Push back on Pragmatist
+                    </button>
+                    <button
+                      onClick={() => openDebate(PERSPECTIVES.pessimist, pessimistContent)}
+                      className="flex items-center gap-2 px-5 py-3 rounded-full bg-forge-bg border border-pessimist-primary/30 text-pessimist-primary hover:bg-pessimist-primary/10 transition-all"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      Push back on Pessimist
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
