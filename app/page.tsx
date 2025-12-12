@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, MessageSquare, Clock } from "lucide-react";
+import { ArrowRight, Loader2, MessageSquare, Clock, ChevronRight } from "lucide-react";
 import { PerspectiveCard } from "@/components/PerspectiveCard";
 import { DebateModal } from "@/components/DebateModal";
 import { HistoryPanel } from "@/components/HistoryPanel";
@@ -162,52 +162,38 @@ export default function Home() {
     setDebateOpen(true);
   };
 
-  const perspectiveContents: Record<PerspectiveType, string> = {
-    steelman: steelmanContent,
-    optimist: optimistContent,
-    pragmatist: pragmatistContent,
-    pessimist: pessimistContent,
-    blindspots: blindspotsContent,
-  };
-
   return (
     <main className="min-h-screen bg-forge-bg">
-      {/* Background elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-steelman-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blindspots-primary/5 rounded-full blur-3xl" />
-      </div>
-
       {/* Split Screen Layout */}
       <div className="relative min-h-screen flex flex-col lg:flex-row">
         {/* LEFT SIDE - Input (sticky on desktop) */}
-        <div className="lg:w-[45%] xl:w-[40%] lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-forge-border bg-forge-bg">
-          <div className="p-6 lg:p-10 xl:p-12 flex flex-col min-h-full">
-            {/* Nav */}
-            <motion.div
+        <div className="lg:w-[42%] xl:w-[38%] lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:overflow-y-auto border-b lg:border-b-0 lg:border-r border-forge-border bg-forge-bg">
+          <div className="p-6 lg:p-10 xl:p-14 flex flex-col min-h-full">
+            {/* Header */}
+            <motion.header
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center justify-between mb-8 lg:mb-12"
+              className="flex items-center justify-between mb-12 lg:mb-16"
             >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-steelman-primary" />
-                <span className="text-sm text-forge-muted font-medium">Perspective Forge</span>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-steelman-primary/10 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-steelman-primary" />
+                </div>
+                <span className="text-sm font-medium text-forge-text tracking-tight">Perspective Forge</span>
               </div>
               {history.length > 0 && (
                 <button
                   onClick={() => setHistoryOpen(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-forge-surface/50 border border-forge-border hover:border-steelman-primary/30 transition-all group"
+                  className="flex items-center gap-1.5 text-sm text-forge-muted hover:text-forge-text transition-colors"
                 >
-                  <Clock className="w-4 h-4 text-forge-muted group-hover:text-steelman-primary transition-colors" />
-                  <span className="text-sm text-forge-muted group-hover:text-forge-text transition-colors hidden sm:inline">
-                    {history.length} past
-                  </span>
+                  <Clock className="w-4 h-4" />
+                  <span className="hidden sm:inline">History</span>
                 </button>
               )}
-            </motion.div>
+            </motion.header>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col justify-center">
+            <div className="flex-1 flex flex-col justify-center max-w-md">
               {/* Headline */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -215,11 +201,11 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="mb-8"
               >
-                <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-forge-text mb-4 leading-tight">
-                  What&apos;s on<br />your mind?
+                <h1 className="font-display text-4xl md:text-5xl text-forge-text leading-tight mb-4">
+                  What decision are you weighing?
                 </h1>
-                <p className="text-forge-muted text-base lg:text-lg">
-                  Share a decision you&apos;re wrestling with.
+                <p className="text-forge-muted text-base leading-relaxed">
+                  Describe your situation. We&apos;ll explore it from multiple perspectives to help you think it through.
                 </p>
               </motion.div>
 
@@ -230,129 +216,126 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
               >
                 <form onSubmit={handleSubmit}>
-                  <div className="relative group mb-4">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-steelman-primary/20 via-optimist-primary/20 to-pessimist-primary/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="relative bg-forge-surface border border-forge-border rounded-xl p-1 focus-within:border-steelman-primary/30 transition-all">
-                      <textarea
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="I'm thinking about..."
-                        rows={4}
-                        className="w-full bg-transparent px-4 py-3 text-forge-text text-base lg:text-lg placeholder-forge-muted/50 resize-none focus:outline-none"
-                      />
-                      <div className="flex justify-end px-2 pb-2">
-                        <button
-                          type="submit"
-                          disabled={!input.trim() || isLoading}
-                          className="bg-steelman-primary hover:bg-steelman-primary/90 disabled:bg-forge-border disabled:cursor-not-allowed text-forge-bg px-5 py-2 rounded-lg font-medium flex items-center gap-2 transition-all text-sm"
-                        >
-                          {isLoading ? (
-                            <>
-                              <Sparkles className="w-4 h-4 animate-pulse" />
-                              Thinking...
-                            </>
-                          ) : (
-                            <>
-                              Explore
-                              <ArrowRight className="w-4 h-4" />
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
+                  <div className="mb-4">
+                    <textarea
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="I'm considering..."
+                      rows={5}
+                      className="w-full bg-forge-surface border border-forge-border rounded-xl px-4 py-4 text-forge-text text-base placeholder-forge-muted/60 resize-none focus:border-steelman-primary/40 focus:ring-2 focus:ring-steelman-primary/10 transition-all"
+                    />
                   </div>
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || isLoading}
+                    className="w-full bg-forge-text hover:bg-forge-text/90 disabled:bg-forge-border disabled:text-forge-muted disabled:cursor-not-allowed text-forge-bg py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        Explore perspectives
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
                 </form>
 
                 {/* Presets */}
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs text-forge-muted/60 mr-1">Try:</span>
-                  {PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => setInput(preset.template)}
-                      className="text-xs text-forge-muted hover:text-steelman-primary transition-colors"
-                    >
-                      {preset.icon} {preset.label}
-                    </button>
-                  ))}
+                <div className="mt-6 pt-6 border-t border-forge-border">
+                  <p className="text-xs text-forge-muted mb-3">Quick starts</p>
+                  <div className="flex flex-wrap gap-2">
+                    {PRESETS.map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => setInput(preset.template)}
+                        className="text-sm px-3 py-1.5 rounded-full bg-forge-accent border border-forge-border text-forge-muted hover:text-forge-text hover:border-forge-text/20 transition-all"
+                      >
+                        {preset.icon} {preset.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>
-
-            {/* Bottom hint */}
-            {!hasResult && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-forge-muted/40 text-xs mt-8 hidden lg:block"
-              >
-                Your perspectives will appear on the right →
-              </motion.p>
-            )}
           </div>
         </div>
 
         {/* RIGHT SIDE - Results (scrollable) */}
-        <div className="lg:w-[55%] xl:w-[60%] lg:ml-[45%] xl:ml-[40%] min-h-screen">
+        <div className="lg:w-[58%] xl:w-[62%] lg:ml-[42%] xl:ml-[38%] min-h-screen">
           {!hasResult ? (
             // Empty state
             <div className="h-full min-h-[50vh] lg:min-h-screen flex items-center justify-center p-6">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="text-center"
+                transition={{ delay: 0.4 }}
+                className="text-center max-w-sm"
               >
-                <div className="w-16 h-16 rounded-full bg-forge-surface border border-forge-border flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-6 h-6 text-forge-muted/50" />
+                <div className="flex justify-center gap-2 mb-6">
+                  {["steelman", "optimist", "pragmatist", "pessimist", "blindspots"].map((type, i) => (
+                    <div
+                      key={type}
+                      className={`w-2 h-2 rounded-full opacity-${20 + i * 15}`}
+                      style={{
+                        backgroundColor: type === "steelman" ? "#B8860B" :
+                          type === "optimist" ? "#D97706" :
+                          type === "pragmatist" ? "#6B7280" :
+                          type === "pessimist" ? "#4B5563" : "#7C3AED",
+                        opacity: 0.2 + i * 0.15
+                      }}
+                    />
+                  ))}
                 </div>
-                <p className="text-forge-muted/60 text-sm">
-                  Your perspectives will appear here
+                <p className="text-forge-muted text-base">
+                  Five perspectives will appear here to help you think through your decision.
                 </p>
               </motion.div>
             </div>
           ) : (
             // Results
-            <div className="p-6 lg:p-10 xl:p-12 space-y-12">
+            <div className="p-6 lg:p-10 xl:p-14">
               {/* User's Question */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="pb-8 border-b border-forge-border"
+                className="mb-10 pb-8 border-b border-forge-border"
               >
-                <p className="text-forge-muted text-xs uppercase tracking-widest mb-2">Exploring</p>
-                <p className="text-lg lg:text-xl text-forge-text font-display italic">
-                  &ldquo;{input}&rdquo;
+                <p className="text-xs font-medium text-forge-muted uppercase tracking-wider mb-3">Exploring</p>
+                <p className="text-xl text-forge-text font-display leading-relaxed">
+                  {input}
                 </p>
               </motion.div>
 
               {/* Section 1: Steelman */}
-              <PerspectiveCard
-                config={PERSPECTIVES.steelman}
-                content={steelmanContent}
-                isStreaming={streamingPerspective === "steelman"}
-                isLoading={currentPhase === "steelman" && !steelmanContent}
-                variant="hero"
-              />
+              <div className="mb-10">
+                <PerspectiveCard
+                  config={PERSPECTIVES.steelman}
+                  content={steelmanContent}
+                  isStreaming={streamingPerspective === "steelman"}
+                  isLoading={currentPhase === "steelman" && !steelmanContent}
+                  variant="hero"
+                />
+              </div>
 
               {/* Section 2: The Trifecta */}
               {showTrifecta && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-4"
+                  transition={{ duration: 0.4 }}
+                  className="mb-10"
                 >
-                  <div>
-                    <p className="text-forge-muted text-xs uppercase tracking-widest mb-1">Three Lenses</p>
-                    <h2 className="font-display text-xl lg:text-2xl text-forge-text">
-                      Different angles
-                    </h2>
+                  <div className="mb-6">
+                    <h2 className="text-lg font-medium text-forge-text">Three lenses</h2>
+                    <p className="text-sm text-forge-muted">Different ways to see your situation</p>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-4">
                     <PerspectiveCard
                       config={PERSPECTIVES.optimist}
                       content={optimistContent}
@@ -366,7 +349,7 @@ export default function Home() {
                       content={pragmatistContent}
                       isStreaming={streamingPerspective === "pragmatist"}
                       isLoading={!pragmatistContent && currentPhase === "trifecta"}
-                      delay={0.2}
+                      delay={0.15}
                       variant="trifecta"
                     />
                     <PerspectiveCard
@@ -374,7 +357,7 @@ export default function Home() {
                       content={pessimistContent}
                       isStreaming={streamingPerspective === "pessimist"}
                       isLoading={!pessimistContent && currentPhase === "trifecta"}
-                      delay={0.3}
+                      delay={0.2}
                       variant="trifecta"
                     />
                   </div>
@@ -386,7 +369,8 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.4 }}
+                  className="mb-10"
                 >
                   <PerspectiveCard
                     config={PERSPECTIVES.blindspots}
@@ -403,38 +387,30 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="pt-8 border-t border-forge-border space-y-4"
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="pt-8 border-t border-forge-border"
                 >
-                  <div>
-                    <p className="text-forge-muted text-xs uppercase tracking-widest mb-1">Go deeper</p>
-                    <h2 className="font-display text-xl text-forge-text">
-                      Challenge a perspective
-                    </h2>
+                  <div className="mb-5">
+                    <h2 className="text-lg font-medium text-forge-text">Go deeper</h2>
+                    <p className="text-sm text-forge-muted">Continue the conversation with any perspective</p>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => openDebate(PERSPECTIVES.optimist, optimistContent)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-forge-surface border border-optimist-primary/30 text-optimist-primary hover:bg-optimist-primary/10 transition-all text-sm"
-                    >
-                      <MessageSquare className="w-3 h-3" />
-                      Optimist
-                    </button>
-                    <button
-                      onClick={() => openDebate(PERSPECTIVES.pragmatist, pragmatistContent)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-forge-surface border border-pragmatist-primary/30 text-pragmatist-primary hover:bg-pragmatist-primary/10 transition-all text-sm"
-                    >
-                      <MessageSquare className="w-3 h-3" />
-                      Pragmatist
-                    </button>
-                    <button
-                      onClick={() => openDebate(PERSPECTIVES.pessimist, pessimistContent)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-forge-surface border border-pessimist-primary/30 text-pessimist-primary hover:bg-pessimist-primary/10 transition-all text-sm"
-                    >
-                      <MessageSquare className="w-3 h-3" />
-                      Pessimist
-                    </button>
+                    {[
+                      { config: PERSPECTIVES.optimist, content: optimistContent },
+                      { config: PERSPECTIVES.pragmatist, content: pragmatistContent },
+                      { config: PERSPECTIVES.pessimist, content: pessimistContent },
+                    ].map(({ config, content }) => (
+                      <button
+                        key={config.colorClass}
+                        onClick={() => openDebate(config, content)}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-forge-surface border border-forge-border text-forge-text hover:border-forge-text/20 transition-all text-sm"
+                      >
+                        <span>{config.icon}</span>
+                        <span>{config.name.replace("The ", "")}</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-forge-muted" />
+                      </button>
+                    ))}
                   </div>
                 </motion.div>
               )}

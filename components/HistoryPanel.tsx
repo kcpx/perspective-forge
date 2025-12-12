@@ -42,7 +42,7 @@ export function HistoryPanel({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-forge-text/20 backdrop-blur-sm z-40"
           />
 
           {/* Panel */}
@@ -51,27 +51,27 @@ export function HistoryPanel({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-forge-surface border-l border-forge-border z-50 flex flex-col"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-forge-bg border-l border-forge-border shadow-elevated z-50 flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-forge-border">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between p-5 border-b border-forge-border">
+              <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5 text-forge-muted" />
-                <h2 className="font-display text-xl text-forge-text">History</h2>
+                <h2 className="text-lg font-medium text-forge-text">History</h2>
                 <span className="text-sm text-forge-muted">({history.length})</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {history.length > 0 && (
                   <button
                     onClick={handleClear}
-                    className="text-sm text-forge-muted hover:text-red-400 transition-colors"
+                    className="text-sm text-forge-muted hover:text-red-600 transition-colors"
                   >
                     Clear all
                   </button>
                 )}
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-forge-border rounded-lg transition-colors"
+                  className="p-2 hover:bg-forge-accent rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-forge-muted" />
                 </button>
@@ -79,13 +79,13 @@ export function HistoryPanel({
             </div>
 
             {/* History List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-2">
               {history.length === 0 ? (
-                <div className="text-center py-12">
-                  <Clock className="w-12 h-12 text-forge-border mx-auto mb-4" />
+                <div className="text-center py-16">
+                  <Clock className="w-10 h-10 text-forge-border mx-auto mb-4" />
                   <p className="text-forge-muted">No history yet</p>
                   <p className="text-sm text-forge-muted/70 mt-1">
-                    Your forged perspectives will appear here
+                    Your explorations will appear here
                   </p>
                 </div>
               ) : (
@@ -98,17 +98,17 @@ export function HistoryPanel({
                       onSelect(session);
                       onClose();
                     }}
-                    className="w-full text-left p-4 rounded-xl bg-forge-bg border border-forge-border hover:border-steelman-primary/30 transition-all group"
+                    className="w-full text-left p-4 rounded-xl bg-forge-surface border border-forge-border hover:border-steelman-primary/30 transition-all group"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-forge-text line-clamp-2 text-sm flex-1">
+                      <p className="text-forge-text line-clamp-2 text-sm flex-1 leading-relaxed">
                         {session.input}
                       </p>
                       <button
                         onClick={(e) => handleDelete(e, session.id)}
-                        className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 rounded-lg transition-all"
+                        className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-50 rounded-lg transition-all"
                       >
-                        <Trash2 className="w-4 h-4 text-red-400" />
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     </div>
                     <p className="text-xs text-forge-muted mt-2">

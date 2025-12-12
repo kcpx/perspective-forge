@@ -9,43 +9,39 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Spectrum colors - scalable for future perspectives
+        // Warm, clean palette
         forge: {
-          bg: "#0a0a0b",
-          surface: "#141416",
-          border: "#2a2a2e",
-          text: "#e4e4e7",
-          muted: "#71717a",
+          bg: "#FDFBF7",        // Warm cream background
+          surface: "#FFFFFF",   // Clean white cards
+          border: "#E8E4DD",    // Soft warm border
+          text: "#2D2A26",      // Warm dark text
+          muted: "#8C857A",     // Warm muted text
+          accent: "#F5F2ED",    // Light accent background
         },
         steelman: {
-          primary: "#c9a227",
-          secondary: "#fef3c7",
-          glow: "rgba(201, 162, 39, 0.15)",
+          primary: "#B8860B",   // Warm gold
+          light: "#FDF8E8",     // Light gold tint
         },
         optimist: {
-          primary: "#f59e0b",
-          secondary: "#fef3c7",
-          glow: "rgba(245, 158, 11, 0.15)",
+          primary: "#D97706",   // Warm amber
+          light: "#FEF6E8",     // Light amber tint
         },
         pragmatist: {
-          primary: "#64748b",
-          secondary: "#e2e8f0",
-          glow: "rgba(100, 116, 139, 0.15)",
+          primary: "#6B7280",   // Neutral gray
+          light: "#F3F4F6",     // Light gray tint
         },
         pessimist: {
-          primary: "#3b82f6",
-          secondary: "#dbeafe",
-          glow: "rgba(59, 130, 246, 0.15)",
+          primary: "#4B5563",   // Cool gray
+          light: "#F1F5F9",     // Light cool tint
         },
         blindspots: {
-          primary: "#a855f7",
-          secondary: "#f3e8ff",
-          glow: "rgba(168, 85, 247, 0.15)",
+          primary: "#7C3AED",   // Purple
+          light: "#F5F3FF",     // Light purple tint
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "serif"],
-        body: ["var(--font-body)", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        body: ["var(--font-body)", "system-ui", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out",
@@ -65,6 +61,11 @@ const config: Config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+      },
+      boxShadow: {
+        'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.05)',
+        'elevated': '0 8px 24px rgba(0, 0, 0, 0.08)',
       },
     },
   },
