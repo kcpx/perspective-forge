@@ -2,10 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, MessageSquare, Clock, ChevronRight } from "lucide-react";
+import { ArrowRight, Loader2, Clock, ChevronRight } from "lucide-react";
 import { PerspectiveCard } from "@/components/PerspectiveCard";
 import { DebateModal } from "@/components/DebateModal";
 import { HistoryPanel } from "@/components/HistoryPanel";
+import { VoiceInput } from "@/components/VoiceInput";
 import { PERSPECTIVES, PerspectiveType, PerspectiveConfig } from "@/types";
 import { PRESETS } from "@/lib/presets";
 import { getHistory, saveSession, HistorySession } from "@/lib/history";
@@ -216,14 +217,21 @@ export default function Home() {
                 transition={{ delay: 0.2 }}
               >
                 <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
+                  <div className="mb-4 relative">
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="I'm considering..."
                       rows={5}
-                      className="w-full bg-forge-surface border border-forge-border rounded-xl px-4 py-4 text-forge-text text-base placeholder-forge-muted/60 resize-none focus:border-steelman-primary/40 focus:ring-2 focus:ring-steelman-primary/10 transition-all"
+                      className="w-full bg-forge-surface border border-forge-border rounded-xl px-4 py-4 pr-14 text-forge-text text-base placeholder-forge-muted/60 resize-none focus:border-steelman-primary/40 focus:ring-2 focus:ring-steelman-primary/10 transition-all"
                     />
+                    {/* Voice Input Button */}
+                    <div className="absolute right-3 bottom-3">
+                      <VoiceInput
+                        onTranscript={(text) => setInput((prev) => prev + (prev ? " " : "") + text)}
+                        disabled={isLoading}
+                      />
+                    </div>
                   </div>
                   <button
                     type="submit"
